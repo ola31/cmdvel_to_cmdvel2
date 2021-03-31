@@ -24,10 +24,10 @@ void imu_Callback(const sensor_msgs::Imu::ConstPtr& msg)
    float diff =0.0;
 
    if(cmd_ang_vel>0){
-     gain*(cmd_ang_vel-imu_ang_vel)+offset;
+     diff = gain*(cmd_ang_vel-imu_ang_vel)+offset;
    }
    else if(cmd_ang_vel<0){
-     gain*(cmd_ang_vel-imu_ang_vel)-offset;
+     diff = gain*(cmd_ang_vel-imu_ang_vel)-offset;
    }
    angular_z = cmd_ang_vel+diff;
 
@@ -42,8 +42,8 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "cmdvel_to_cmdvel2_node");
   ros::NodeHandle nh;
 
-  ros::Publisher cmdvel2_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel2", 1000);
-  ros::Subscriber cmdvel_sub = nh.subscribe("cmd_vel", 1000, cmdvel_Callback);
+  ros::Publisher cmdvel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1000);
+  ros::Subscriber cmdvel2_sub = nh.subscribe("cmd_vel2", 1000, cmdvel_Callback);
   ros::Subscriber imu_sub = nh.subscribe("/imu", 1000, imu_Callback);
 
   ros::Rate loop_rate(100);
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
     msg.angular.z= angular_z;
 
 
-    cmdvel2_pub.publish(msg);
+    cmdvel_pub.publish(msg);
 
     ros::spinOnce();
 
